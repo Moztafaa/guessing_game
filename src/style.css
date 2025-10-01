@@ -37,18 +37,3 @@ body {
 .flip-half {
     transform: rotateY(90deg);
 }
-
-/* Disable hover effect for face up and matched cards */
-/* .card.faceup:hover .img-card,
-.card.matched:hover .img-card {
-    transform: none;
-    cursor: default;
-} */
-
-/* Improve rendering during flips */
-/* Backface not hidden since we swap a single <img> at 90deg */
-
-/* Optional: perspective on the grid for subtle depth */
-/* .grid {
-    perspective: 800px;
-} */

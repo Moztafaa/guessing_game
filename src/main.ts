@@ -1,4 +1,5 @@
 import "bootstrap"
+import "bootstrap/dist/css/bootstrap.min.css";
 
 
 interface Card {
@@ -60,6 +61,25 @@ function renderBoard() {
   if (!app) return;
   app.innerHTML = "";
 
+  // Progress bar container (Bootstrap)
+  const progressContainer = document.createElement("div");
+  progressContainer.className = "container mb-3";
+  progressContainer.innerHTML = `
+    <div class="row">
+      <div class="col">
+        <div class="d-flex justify-content-between align-items-center mb-1">
+          <span class="text-light small">Matches</span>
+          <span id="match-progress-text" class="text-light small"></span>
+        </div>
+        <div class="progress" role="progressbar" aria-label="Matches progress" aria-valuemin="0" aria-valuemax="100">
+          <div id="match-progress" class="progress-bar" style="width: 0%"></div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  app.appendChild(progressContainer);
+
   const grid = document.createElement("div")
   grid.className = "grid"
   app.appendChild(grid)
@@ -88,6 +108,8 @@ function renderBoard() {
 
   grid.innerHTML = cardHTMLWithBootstrap;
 
+  // Initialize progress on first render
+  updateProgressBar();
 
 
   grid.addEventListener("click", handleBoardclick)
@@ -187,6 +209,8 @@ function checkForMatch() {
     isChecking = false;
 
     updateCardView(secondCard.index)
+    // Update progress after a successful match
+    updateProgressBar();
     ckeckGameComplete();
   } else {
     console.log("No match - flipp back in 1 second ...");
@@ -208,6 +232,26 @@ function ckeckGameComplete() {
   if (allMatched) {
     console.log("Mabrook ya 7areeef :)");
 
+  }
+}
+
+// Update the bootstrap progress bar to show matched pairs out of total
+function updateProgressBar() {
+  const totalPairs = cards.length / 2;
+  const matchedCards = cards.filter(c => c.status === Cardstatus.matched).length;
+  const matchedPairs = Math.floor(matchedCards / 2);
+  const percent = Math.round((matchedPairs / totalPairs) * 100);
+
+  const bar = document.getElementById("match-progress") as HTMLDivElement | null;
+  const text = document.getElementById("match-progress-text") as HTMLSpanElement | null;
+  if (bar) {
+    bar.style.width = `${percent}%`;
+    bar.setAttribute("aria-valuenow", String(percent));
+    bar.textContent = `${percent}%`;
+    bar.classList.toggle("bg-success", matchedPairs === totalPairs);
+  }
+  if (text) {
+    text.textContent = `${matchedPairs}/${totalPairs} matches`;
   }
 }
 
