@@ -1,51 +1,54 @@
-
 body {
-  background-color: #2c2c2c !important;
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 20px;
+    background-color: #2c2c2c !important;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
 }
 
 .img-card {
-  width: 200px;
-  height: 200px;
-  display: block;
-  border-radius: 8px;
-  transition: transform 0.2s ease;
+    width: 200px;
+    height: 200px;
+    display: block;
+    border-radius: 8px;
+    transition: transform 0.2s ease;
 }
 
 /* Card container styles */
 .card {
-  cursor: pointer;
-  border: none;
-  background: transparent;
-}
-
-.card:hover .img-card {
-  transform: scale(1.05);
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    transform-style: preserve-3d;
+    will-change: transform;
+    transition: transform 0.4s ease-in-out;
 }
 
 /* Face down cards */
 .card.facedown .img-card {
-  opacity: 1;
+    opacity: 1;
 }
 
 /* Face up cards */
 .card.faceup .img-card {
-  opacity: 1;
+    opacity: 1;
 }
 
-/* Matched cards */
-.card.matched .img-card {
-  opacity: 0.7;
-  box-shadow: 0 4px 8px rgba(255, 215, 0, 0.5);
-  border: 2px solid #ffd700;
+/* Half flip to 90deg; TypeScript swaps the image at this point, then we animate back */
+.flip-half {
+    transform: rotateY(90deg);
 }
 
 /* Disable hover effect for face up and matched cards */
-.card.faceup:hover .img-card,
+/* .card.faceup:hover .img-card,
 .card.matched:hover .img-card {
-  transform: none;
-  cursor: default;
-}
+    transform: none;
+    cursor: default;
+} */
 
+/* Improve rendering during flips */
+/* Backface not hidden since we swap a single <img> at 90deg */
+
+/* Optional: perspective on the grid for subtle depth */
+/* .grid {
+    perspective: 800px;
+} */

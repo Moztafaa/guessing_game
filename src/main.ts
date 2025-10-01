@@ -25,8 +25,8 @@ let cards: Card[] = [
   { id: 4, imagesrc: "../assets/images/3.jpg", status: Cardstatus.facedown, index: 7 },
   { id: 5, imagesrc: "../assets/images/4.jpg", status: Cardstatus.facedown, index: 8 },
   { id: 5, imagesrc: "../assets/images/4.jpg", status: Cardstatus.facedown, index: 9 },
-  { id: 6, imagesrc: "../assets/images/5.jpg", status: Cardstatus.facedown, index: 10 },
-  { id: 6, imagesrc: "../assets/images/5.jpg", status: Cardstatus.facedown, index: 11 },
+  { id: 6, imagesrc: "../assets/images/8.jpg", status: Cardstatus.facedown, index: 10 },
+  { id: 6, imagesrc: "../assets/images/8.jpg", status: Cardstatus.facedown, index: 11 },
   { id: 7, imagesrc: "../assets/images/6.jpg", status: Cardstatus.facedown, index: 12 },
   { id: 7, imagesrc: "../assets/images/6.jpg", status: Cardstatus.facedown, index: 13 },
   { id: 8, imagesrc: "../assets/images/7.jpg", status: Cardstatus.facedown, index: 14 },
@@ -98,8 +98,15 @@ function renderBoard() {
 let flippedCards: Card[] = [];
 let isChecking: boolean = false;
 
+// Flip animation timing (keep in sync with CSS .card transition)
+const FLIP_DURATION_MS = 600; // total animation time (90 out + 90 back)
+const HALF_FLIP_MS = FLIP_DURATION_MS / 2;
 
-function updateCardVie(index: number) {
+// Track mid-flip swaps per card to avoid overlapping timers
+const swapTimeouts: Record<number, number | undefined> = {};
+
+
+function updateCardView(index: number) {
   const cardData = cards[index]
   const cardElement = document.querySelector(`.card[data-index='${index}'`) as HTMLElement
 
@@ -109,13 +116,28 @@ function updateCardVie(index: number) {
 
   if (!img) return;
 
-  if (cardData.status === Cardstatus.facedown) {
-    img.src = "../assets/back.jpg"
-  } else {
-    img.src = cardData.imagesrc
-  }
+  const targetSrc = cardData.status === Cardstatus.facedown ? "../assets/back.jpg" : cardData.imagesrc;
 
-  cardElement.className = `card ${cardData.status}`
+  // Clear any pending mid-flip swap for this card
+  if (swapTimeouts[index] !== undefined) {
+    clearTimeout(swapTimeouts[index]);
+  }
+  // no end timeout needed with half-flip approach
+
+  // Ensure base classes reflect current status and start from 0deg
+  cardElement.className = `card ${cardData.status}`;
+  cardElement.classList.remove("flip-half");
+  // Trigger half flip to 90deg so we can swap mid-way
+  requestAnimationFrame(() => {
+    cardElement.classList.add("flip-half");
+  });
+
+  // Swap the image at 90deg, then animate back to 0deg
+  swapTimeouts[index] = window.setTimeout(() => {
+    img.src = targetSrc;
+    cardElement.classList.remove("flip-half");
+    // className remains `card ${status}` with base transition animating back
+  }, HALF_FLIP_MS);
 }
 
 
@@ -146,8 +168,7 @@ function flipCard(card: Card) {
   if (card.status === Cardstatus.facedown) {
     card.status = Cardstatus.faceup;
     flippedCards.push(card)
-    // renderBoard();
-    updateCardVie(card.index)
+    updateCardView(card.index)
 
     if (flippedCards.length === 2) checkForMatch();
   }
@@ -164,9 +185,8 @@ function checkForMatch() {
     secondCard.status = Cardstatus.matched;
     flippedCards = [];
     isChecking = false;
-    // renderBoard();
-    updateCardVie(firstCard.index)
-    updateCardVie(secondCard.index)
+
+    updateCardView(secondCard.index)
     ckeckGameComplete();
   } else {
     console.log("No match - flipp back in 1 second ...");
@@ -175,11 +195,10 @@ function checkForMatch() {
       secondCard.status = Cardstatus.facedown;
       flippedCards = []
       isChecking = false
-      // renderBoard()
-      updateCardVie(firstCard.index)
-      updateCardVie(secondCard.index)
+      updateCardView(firstCard.index)
+      updateCardView(secondCard.index)
 
-    }, 1000);
+    }, 500);
   }
 }
 
