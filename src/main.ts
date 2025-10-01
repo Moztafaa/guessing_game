@@ -57,46 +57,67 @@ function shuffle(array: Card[]): Card[] {
 }
 
 function renderBoard() {
-  if (app) {
-    app.innerHTML = "";
+  if (!app) return;
+  app.innerHTML = "";
 
-    const grid = document.createElement("div")
-    grid.className = "grid"
-    app.appendChild(grid)
-    let cardHTMLWithBootstrap = `
+  const grid = document.createElement("div")
+  grid.className = "grid"
+  app.appendChild(grid)
+  let cardHTMLWithBootstrap = `
         <div class="container">
             <div class="row row-cols-4 g-3">
         `;
 
-    cards.forEach((card, index) => {
-      const displayImage = card.status === Cardstatus.facedown ? "../assets/back.jpg" : card.imagesrc;
+  cards.forEach((card, index) => {
+    card.index = index;
+    const displayImage = card.status === Cardstatus.facedown ? "../assets/back.jpg" : card.imagesrc;
 
-      cardHTMLWithBootstrap += `
+    cardHTMLWithBootstrap += `
         <div class="col">
             <div class="card ${card.status}" data-index="${index}" data-id="${card.id}">
                 <img src="${displayImage}" class="card-img-top img-card" alt="..." />
             </div>
         </div>
         `;
-    });
+  });
 
-    cardHTMLWithBootstrap += `
+  cardHTMLWithBootstrap += `
         </div>
     </div>
       `;
 
-    grid.innerHTML = cardHTMLWithBootstrap;
+  grid.innerHTML = cardHTMLWithBootstrap;
 
 
 
-    grid.addEventListener("click", handleBoardclick)
+  grid.addEventListener("click", handleBoardclick)
 
 
-  }
 }
 
 let flippedCards: Card[] = [];
 let isChecking: boolean = false;
+
+
+function updateCardVie(index: number) {
+  const cardData = cards[index]
+  const cardElement = document.querySelector(`.card[data-index='${index}'`) as HTMLElement
+
+  if (!cardElement) return;
+
+  const img = cardElement.querySelector("img") as HTMLImageElement;
+
+  if (!img) return;
+
+  if (cardData.status === Cardstatus.facedown) {
+    img.src = "../assets/back.jpg"
+  } else {
+    img.src = cardData.imagesrc
+  }
+
+  cardElement.className = `card ${cardData.status}`
+}
+
 
 function handleBoardclick(this: HTMLDivElement, event: Event) {
   const target = event.target as HTMLElement;
@@ -125,7 +146,8 @@ function flipCard(card: Card) {
   if (card.status === Cardstatus.facedown) {
     card.status = Cardstatus.faceup;
     flippedCards.push(card)
-    renderBoard();
+    // renderBoard();
+    updateCardVie(card.index)
 
     if (flippedCards.length === 2) checkForMatch();
   }
@@ -142,7 +164,9 @@ function checkForMatch() {
     secondCard.status = Cardstatus.matched;
     flippedCards = [];
     isChecking = false;
-    renderBoard();
+    // renderBoard();
+    updateCardVie(firstCard.index)
+    updateCardVie(secondCard.index)
     ckeckGameComplete();
   } else {
     console.log("No match - flipp back in 1 second ...");
@@ -151,7 +175,9 @@ function checkForMatch() {
       secondCard.status = Cardstatus.facedown;
       flippedCards = []
       isChecking = false
-      renderBoard()
+      // renderBoard()
+      updateCardVie(firstCard.index)
+      updateCardVie(secondCard.index)
 
     }, 1000);
   }
