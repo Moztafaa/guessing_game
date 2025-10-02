@@ -1,39 +1,294 @@
 body {
-    background-color: #2c2c2c !important;
-    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
     padding: 20px;
+    overflow-x: hidden;
 }
 
-.img-card {
-    width: 200px;
-    height: 200px;
-    display: block;
-    border-radius: 8px;
-    transition: transform 0.2s ease;
+/* App container */
+#app {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px 0;
 }
 
-/* Card container styles */
-.card {
+/* Card wrapper for animations */
+.card-wrapper {
+    perspective: 1000px;
+}
+
+/* Game card styles */
+.game-card {
     cursor: pointer;
     border: none;
     background: transparent;
     transform-style: preserve-3d;
     will-change: transform;
     transition: transform 0.4s ease-in-out;
+    position: relative;
 }
 
-/* Face down cards */
-.card.facedown .img-card {
+.card-inner {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    transition: all 0.3s ease;
+}
+
+.img-card {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 3 / 4;
+    display: block;
+    border-radius: 8px;
+    object-fit: contain;
+    background-color: #1a1a2e;
+    transition: all 0.3s ease;
+}
+
+/* Glow effect for cards */
+.card-glow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 8px;
+    background: linear-gradient(
+        135deg,
+        rgba(99, 102, 241, 0.2),
+        rgba(139, 92, 246, 0.2)
+    );
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+/* Hover effects */
+.game-card:hover .card-inner {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 12px 48px rgba(99, 102, 241, 0.4);
+}
+
+.game-card:hover .card-glow {
     opacity: 1;
 }
 
-/* Face up cards */
-.card.faceup .img-card {
+/* Face down cards - subtle pulse animation */
+.game-card.facedown .card-inner {
+    border: 2px solid rgba(99, 102, 241, 0.3);
+}
+
+/* Face up cards - bright glow */
+.game-card.faceup .card-inner {
+    border: 2px solid rgba(139, 92, 246, 0.6);
+    box-shadow: 0 8px 32px rgba(139, 92, 246, 0.5);
+}
+
+/* Matched cards - success glow */
+.game-card.matched .card-inner {
+    border: 2px solid rgba(34, 197, 94, 0.6);
+    box-shadow: 0 8px 32px rgba(34, 197, 94, 0.4);
+    animation: matchPulse 0.6s ease-out;
+}
+
+.game-card.matched .card-glow {
+    background: linear-gradient(
+        135deg,
+        rgba(34, 197, 94, 0.3),
+        rgba(16, 185, 129, 0.3)
+    );
     opacity: 1;
 }
 
-/* Half flip to 90deg; TypeScript swaps the image at this point, then we animate back */
+/* Half flip animation */
 .flip-half {
     transform: rotateY(90deg);
+}
+
+/* Match animation */
+@keyframes matchPulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Progress bar customization */
+.progress {
+    background-color: rgba(30, 30, 46, 0.8);
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    transition: width 0.6s ease;
+    font-size: 14px;
+}
+
+/* Bootstrap card customization */
+.card {
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    #app {
+        padding: 10px 0;
+    }
+
+    .display-4 {
+        font-size: 2rem !important;
+    }
+
+    .lead {
+        font-size: 1rem !important;
+    }
+}
+
+/* Custom scrollbar for dark theme */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(30, 30, 46, 0.5);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(99, 102, 241, 0.5);
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(99, 102, 241, 0.8);
+}
+
+/* Title animation */
+.display-4 {
+    animation: fadeInDown 0.8s ease-out;
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Card entrance animation */
+.card-wrapper {
+    animation: cardEntrance 0.6s ease-out backwards;
+}
+
+.card-wrapper:nth-child(1) {
+    animation-delay: 0.05s;
+}
+.card-wrapper:nth-child(2) {
+    animation-delay: 0.1s;
+}
+.card-wrapper:nth-child(3) {
+    animation-delay: 0.15s;
+}
+.card-wrapper:nth-child(4) {
+    animation-delay: 0.2s;
+}
+.card-wrapper:nth-child(5) {
+    animation-delay: 0.25s;
+}
+.card-wrapper:nth-child(6) {
+    animation-delay: 0.3s;
+}
+.card-wrapper:nth-child(7) {
+    animation-delay: 0.35s;
+}
+.card-wrapper:nth-child(8) {
+    animation-delay: 0.4s;
+}
+.card-wrapper:nth-child(9) {
+    animation-delay: 0.45s;
+}
+.card-wrapper:nth-child(10) {
+    animation-delay: 0.5s;
+}
+.card-wrapper:nth-child(11) {
+    animation-delay: 0.55s;
+}
+.card-wrapper:nth-child(12) {
+    animation-delay: 0.6s;
+}
+.card-wrapper:nth-child(13) {
+    animation-delay: 0.65s;
+}
+.card-wrapper:nth-child(14) {
+    animation-delay: 0.7s;
+}
+.card-wrapper:nth-child(15) {
+    animation-delay: 0.75s;
+}
+.card-wrapper:nth-child(16) {
+    animation-delay: 0.8s;
+}
+
+@keyframes cardEntrance {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Modal customization */
+.modal-content {
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.modal-header {
+    border-bottom-width: 2px;
+}
+
+/* Button hover effects */
+.btn {
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Stats card animation */
+.card.bg-dark {
+    animation: fadeIn 0.8s ease-out 0.3s backwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
