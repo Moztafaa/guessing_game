@@ -1,5 +1,0 @@
-1- progress bar
-
-2- sound on flip and sound on completion
-
-
