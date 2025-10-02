@@ -185,11 +185,53 @@ function handleBoardclick(this: HTMLDivElement, event: Event) {
   }
 }
 
+// ...existing code...
+
+// Track currently playing audio
+let currentAudio: HTMLAudioElement | null = null;
+
+// play flip sound
+function playFlipSound() {
+  stopCurrentSound();
+  currentAudio = new Audio('../assets/audio/flip.mp3');
+  currentAudio.play();
+}
+
+// play match sound
+function playMatchSound() {
+  stopCurrentSound();
+  currentAudio = new Audio('../assets/audio/good.mp3');
+  currentAudio.play();
+}
+
+// play nomatch sound
+function playNoMatchSound() {
+  stopCurrentSound();
+  currentAudio = new Audio('../assets/audio/fail.mp3');
+  currentAudio.play();
+}
+
+function playWinSound() {
+  stopCurrentSound();
+  currentAudio = new Audio('../assets/audio/game-over.mp3');
+  currentAudio.play();
+}
+
+// Stop the currently playing sound
+function stopCurrentSound() {
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
+    currentAudio = null;
+  }
+}
 
 function flipCard(card: Card) {
   if (card.status === Cardstatus.facedown) {
     card.status = Cardstatus.faceup;
     flippedCards.push(card)
+    playFlipSound();
+
     updateCardView(card.index)
 
     if (flippedCards.length === 2) checkForMatch();
@@ -207,11 +249,12 @@ function checkForMatch() {
     secondCard.status = Cardstatus.matched;
     flippedCards = [];
     isChecking = false;
+    playMatchSound();
 
     updateCardView(secondCard.index)
     // Update progress after a successful match
     updateProgressBar();
-    ckeckGameComplete();
+    checkGameComplete();
   } else {
     console.log("No match - flipp back in 1 second ...");
     setTimeout(() => {
@@ -219,6 +262,7 @@ function checkForMatch() {
       secondCard.status = Cardstatus.facedown;
       flippedCards = []
       isChecking = false
+      playNoMatchSound();
       updateCardView(firstCard.index)
       updateCardView(secondCard.index)
 
@@ -227,9 +271,10 @@ function checkForMatch() {
 }
 
 
-function ckeckGameComplete() {
+function checkGameComplete() {
   const allMatched = cards.every(card => card.status === Cardstatus.matched)
   if (allMatched) {
+    playWinSound();
     console.log("Mabrook ya 7areeef :)");
 
   }
